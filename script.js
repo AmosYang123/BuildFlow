@@ -139,7 +139,7 @@ function goBack() {
     location.reload();
 }
 
-function sendMessage() {
+async function sendMessage() {
     const chatInput = document.getElementById('chat-input');
     const message = chatInput.value.trim();
     
@@ -155,12 +155,15 @@ function sendMessage() {
     // Show typing indicator
     showTypingIndicator();
     
-    // Simulate AI processing (in real app, this would call an AI API)
-    setTimeout(() => {
+    try {
+        // Get AI response
+        const aiResponse = await analyzeProject(message);
         hideTypingIndicator();
-        const aiResponse = analyzeProject(message);
         addMessage(aiResponse, 'ai');
-    }, 1500);
+    } catch (error) {
+        hideTypingIndicator();
+        addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+    }
 }
 
 function addMessage(content, sender) {
@@ -229,49 +232,135 @@ function hideTypingIndicator() {
     }
 }
 
-function analyzeProject(userMessage) {
+async function analyzeProject(userMessage) {
+    try {
+        // Show loading state
+        const sendButton = document.getElementById('send-button');
+        const originalContent = sendButton.innerHTML;
+        sendButton.innerHTML = '<div class="loading-spinner"></div>';
+        sendButton.disabled = true;
+        
+        // Call OpenAI API
+        const response = await fetch('/api/analyze-project', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: userMessage,
+                conversationHistory: getConversationHistory()
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+        
+        const data = await response.json();
+        
+        // Restore button
+        sendButton.innerHTML = originalContent;
+        sendButton.disabled = false;
+        
+        return data.response;
+        
+    } catch (error) {
+        console.error('AI API Error:', error);
+        
+        // Restore button
+        const sendButton = document.getElementById('send-button');
+        sendButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+        sendButton.disabled = false;
+        
+        // Fallback to smart keyword analysis
+        return getSmartFallbackResponse(userMessage);
+    }
+}
+
+function getConversationHistory() {
+    const messages = document.querySelectorAll('.message');
+    const history = [];
+    
+    messages.forEach(message => {
+        if (message.classList.contains('user-message')) {
+            const content = message.querySelector('.message-content p').textContent;
+            history.push({ role: 'user', content });
+        } else if (message.classList.contains('ai-message') && !message.classList.contains('typing-indicator')) {
+            const content = message.querySelector('.message-content p').innerHTML;
+            history.push({ role: 'assistant', content });
+        }
+    });
+    
+    return history;
+}
+
+function getSmartFallbackResponse(userMessage) {
     const message = userMessage.toLowerCase();
     
-    // Simple keyword-based analysis (in real app, this would use AI)
-    if (message.includes('portfolio') || message.includes('personal') || message.includes('resume')) {
-        return `I understand! You want to build a <strong>Personal Portfolio</strong> website. This is perfect for showcasing your work, skills, and experience. 
-
-Let me help you create a professional portfolio. What kind of work do you want to showcase? (e.g., design, development, photography, writing, etc.)`;
+    // More sophisticated keyword analysis as fallback
+    const projectTypes = {
+        portfolio: ['portfolio', 'personal', 'resume', 'cv', 'showcase', 'work', 'projects'],
+        blog: ['blog', 'article', 'content', 'writing', 'publish', 'share'],
+        business: ['business', 'company', 'startup', 'ecommerce', 'shop', 'store', 'commercial'],
+        restaurant: ['restaurant', 'cafe', 'food', 'menu', 'dining', 'kitchen'],
+        nonprofit: ['nonprofit', 'charity', 'community', 'education', 'volunteer', 'donation'],
+        saas: ['saas', 'software', 'app', 'application', 'platform', 'tool'],
+        landing: ['landing', 'marketing', 'conversion', 'sales', 'lead'],
+        directory: ['directory', 'listing', 'catalog', 'database', 'search']
+    };
+    
+    for (const [type, keywords] of Object.entries(projectTypes)) {
+        if (keywords.some(keyword => message.includes(keyword))) {
+            return getTypeSpecificResponse(type, userMessage);
+        }
     }
     
-    if (message.includes('blog') || message.includes('blog') || message.includes('article')) {
-        return `Great! You're looking to build a <strong>Blog</strong> website. This is excellent for sharing your thoughts, expertise, or stories.
+    // If no specific type detected, ask clarifying questions
+    return `I see you want to build something interesting! To help you better, could you tell me more about:
 
-What will your blog be about? (e.g., cooking, travel, technology, lifestyle, etc.)`;
-    }
-    
-    if (message.includes('business') || message.includes('company') || message.includes('startup') || message.includes('ecommerce') || message.includes('shop')) {
-        return `Perfect! You want to build a <strong>Business Website</strong>. This could be a company site, startup landing page, or e-commerce store.
-
-What type of business is this? (e.g., service-based, product sales, SaaS, etc.)`;
-    }
-    
-    if (message.includes('restaurant') || message.includes('cafe') || message.includes('food') || message.includes('menu')) {
-        return `Excellent! You're building a <strong>Restaurant or Food Business</strong> website. This is great for showcasing your menu, location, and services.
-
-Do you want to include online ordering, reservations, or just information about your restaurant?`;
-    }
-    
-    if (message.includes('nonprofit') || message.includes('charity') || message.includes('community') || message.includes('education')) {
-        return `Wonderful! You're creating a <strong>Community or Nonprofit</strong> website. This is perfect for making a positive impact.
-
-What's the main purpose of your organization? (e.g., education, charity, community service, etc.)`;
-    }
-    
-    // Default response for unrecognized projects
-    return `Interesting project idea! I can help you build this. 
-
-To better understand your needs, could you tell me:
-• What's the main purpose of your website?
-• Who is your target audience?
-• What features do you envision?
+• **What's the main purpose** of your website?
+• **Who is your target audience**?
+• **What key features** do you envision?
 
 This will help me create the perfect workflow for your project!`;
+}
+
+function getTypeSpecificResponse(type, userMessage) {
+    const responses = {
+        portfolio: `I understand! You want to build a <strong>Personal Portfolio</strong> website. This is perfect for showcasing your work, skills, and experience.
+
+What kind of work do you want to showcase? (e.g., design, development, photography, writing, etc.)`,
+        
+        blog: `Great! You're looking to build a <strong>Blog</strong> website. This is excellent for sharing your thoughts, expertise, or stories.
+
+What will your blog be about? (e.g., cooking, travel, technology, lifestyle, etc.)`,
+        
+        business: `Perfect! You want to build a <strong>Business Website</strong>. This could be a company site, startup landing page, or e-commerce store.
+
+What type of business is this? (e.g., service-based, product sales, SaaS, etc.)`,
+        
+        restaurant: `Excellent! You're building a <strong>Restaurant or Food Business</strong> website. This is great for showcasing your menu, location, and services.
+
+Do you want to include online ordering, reservations, or just information about your restaurant?`,
+        
+        nonprofit: `Wonderful! You're creating a <strong>Community or Nonprofit</strong> website. This is perfect for making a positive impact.
+
+What's the main purpose of your organization? (e.g., education, charity, community service, etc.)`,
+        
+        saas: `Awesome! You're building a <strong>SaaS Application</strong>. This is great for creating software solutions.
+
+What problem does your SaaS solve? (e.g., project management, analytics, communication, etc.)`,
+        
+        landing: `Perfect! You want to build a <strong>Landing Page</strong>. This is excellent for marketing and conversions.
+
+What are you promoting? (e.g., product launch, service, event, etc.)`,
+        
+        directory: `Great! You're creating a <strong>Directory Website</strong>. This is perfect for organizing and displaying listings.
+
+What type of listings will you have? (e.g., businesses, people, products, services, etc.)`
+    };
+    
+    return responses[type] || responses.portfolio;
 }
 
 function showProjectSummary() {
