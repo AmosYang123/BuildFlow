@@ -240,8 +240,8 @@ async function analyzeProject(userMessage) {
         sendButton.innerHTML = '<div class="loading-spinner"></div>';
         sendButton.disabled = true;
         
-        // Call OpenAI API
-        const response = await fetch('/api/analyze-project', {
+        // Call Groq API via Netlify function
+        const response = await fetch('/.netlify/functions/analyze-project', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -253,7 +253,9 @@ async function analyzeProject(userMessage) {
         });
         
         if (!response.ok) {
-            throw new Error('API request failed');
+            const errorText = await response.text();
+            console.error('API Error Response:', errorText);
+            throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
@@ -266,6 +268,10 @@ async function analyzeProject(userMessage) {
         
     } catch (error) {
         console.error('AI API Error:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+        });
         
         // Restore button
         const sendButton = document.getElementById('send-button');
