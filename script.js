@@ -1,47 +1,11 @@
 let selectedProject = null;
 
 function selectProject(projectId) {
-    // Remove previous selection
-    if (selectedProject) {
-        const prevCard = document.querySelector(`[onclick="selectProject('${selectedProject}')"]`);
-        const prevIndicator = document.getElementById(`${selectedProject}-indicator`);
-        if (prevCard) prevCard.classList.remove('selected');
-        if (prevIndicator) prevIndicator.style.display = 'none';
-    }
-    
-    // Add new selection
-    selectedProject = projectId;
-    const card = document.querySelector(`[onclick="selectProject('${projectId}')"]`);
-    const indicator = document.getElementById(`${projectId}-indicator`);
-    
-    if (card) card.classList.add('selected');
-    if (indicator) indicator.style.display = 'flex';
-    
-    // Show feedback
-    showFeedback(projectId);
-    
-    // Simulate transition to next step after 2 seconds
-    setTimeout(() => {
-        showNextStep(projectId);
-    }, 2000);
+    // Go directly to next step without delay or feedback
+    showNextStep(projectId);
 }
 
-function showFeedback(projectId) {
-    const feedback = document.getElementById('selection-feedback');
-    const feedbackText = document.getElementById('feedback-text');
-    
-    // Get project title
-    const card = document.querySelector(`[onclick="selectProject('${projectId}')"]`);
-    const title = card.querySelector('h3').textContent;
-    
-    feedbackText.textContent = `${title} selected`;
-    feedback.classList.add('show');
-    
-    // Hide feedback after 3 seconds
-    setTimeout(() => {
-        feedback.classList.remove('show');
-    }, 3000);
-}
+
 
 function showNextStep(projectId) {
     // Create next step content
