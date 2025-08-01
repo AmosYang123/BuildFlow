@@ -8,40 +8,134 @@ function selectProject(projectId) {
 
 
 function showNextStep(projectId) {
-    // Create next step content
+    if (projectId === 'custom-idea') {
+        showCustomIdeaStep();
+    } else {
+        // For other project types, show the generic next step
+        const container = document.querySelector('.container');
+        container.innerHTML = `
+            <div class="next-step">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+                <h1>Great Choice!</h1>
+                <p>You've selected <span class="highlight">${getProjectTitle(projectId)}</span></p>
+                
+                <div class="next-step-card">
+                    <h2>Next Steps</h2>
+                    <p>We're now customizing your workflow based on your project type. You'll be guided through specialized questions and tools to bring your vision to life.</p>
+                    
+                    <div class="progress-indicators">
+                        <div class="progress-item completed">
+                            <div class="progress-dot"></div>
+                            <span>Project Selected</span>
+                        </div>
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                        <div class="progress-item active">
+                            <div class="progress-dot"></div>
+                            <span>Customizing Workflow</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="goBack()" class="back-button">
+                    ← Back to Project Selection
+                </button>
+            </div>
+        `;
+    }
+}
+
+function showCustomIdeaStep() {
     const container = document.querySelector('.container');
     container.innerHTML = `
-        <div class="next-step">
-            <div class="success-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 6L9 17l-5-5"/>
-                </svg>
-            </div>
-            <h1>Great Choice!</h1>
-            <p>You've selected <span class="highlight">${getProjectTitle(projectId)}</span></p>
-            
-            <div class="next-step-card">
-                <h2>Next Steps</h2>
-                <p>We're now customizing your workflow based on your project type. You'll be guided through specialized questions and tools to bring your vision to life.</p>
-                
-                <div class="progress-indicators">
-                    <div class="progress-item completed">
-                        <div class="progress-dot"></div>
-                        <span>Project Selected</span>
-                    </div>
-                    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
+        <div class="custom-idea-step">
+            <div class="step-header">
+                <div class="step-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4"/>
+                        <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                        <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
                     </svg>
-                    <div class="progress-item active">
-                        <div class="progress-dot"></div>
-                        <span>Customizing Workflow</span>
+                </div>
+                <h1>Let's Bring Your Idea to Life!</h1>
+                <p>First, let's understand what you want to build. This will help us create the perfect workflow for your project.</p>
+            </div>
+            
+            <div class="idea-form-card">
+                <h2>Step 1: Define Your Project</h2>
+                
+                <div class="form-group">
+                    <label for="project-name">What's your project called?</label>
+                    <input type="text" id="project-name" placeholder="e.g., My Portfolio, Recipe App, Travel Blog..." class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="project-description">Describe what you want to build</label>
+                    <textarea id="project-description" placeholder="Tell us about your idea... What's the main purpose? Who is it for? What features do you envision?" class="form-textarea" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>What type of project is this?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="project-type" value="personal" checked>
+                            <span class="radio-custom"></span>
+                            <div class="radio-content">
+                                <div class="radio-icon">👤</div>
+                                <div>
+                                    <div class="radio-title">Personal Project</div>
+                                    <div class="radio-description">Portfolio, blog, hobby site, or personal experiment</div>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-option">
+                            <input type="radio" name="project-type" value="business">
+                            <span class="radio-custom"></span>
+                            <div class="radio-content">
+                                <div class="radio-icon">💼</div>
+                                <div>
+                                    <div class="radio-title">Business Project</div>
+                                    <div class="radio-description">Company website, startup, or commercial application</div>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-option">
+                            <input type="radio" name="project-type" value="community">
+                            <span class="radio-custom"></span>
+                            <div class="radio-content">
+                                <div class="radio-icon">🌍</div>
+                                <div>
+                                    <div class="radio-title">Community Project</div>
+                                    <div class="radio-description">Non-profit, educational, or community-focused site</div>
+                                </div>
+                            </div>
+                        </label>
                     </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button onclick="goBack()" class="btn-secondary">
+                        ← Back
+                    </button>
+                    <button onclick="continueToNextStep()" class="btn-primary">
+                        Continue →
+                    </button>
                 </div>
             </div>
             
-            <button onclick="goBack()" class="back-button">
-                ← Back to Project Selection
-            </button>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 25%"></div>
+                </div>
+                <div class="progress-text">Step 1 of 4</div>
+            </div>
         </div>
     `;
 }
@@ -53,6 +147,86 @@ function getProjectTitle(projectId) {
 
 function goBack() {
     location.reload();
+}
+
+function continueToNextStep() {
+    const projectName = document.getElementById('project-name').value;
+    const projectDescription = document.getElementById('project-description').value;
+    const projectType = document.querySelector('input[name="project-type"]:checked').value;
+    
+    if (!projectName.trim()) {
+        alert('Please enter a project name');
+        return;
+    }
+    
+    if (!projectDescription.trim()) {
+        alert('Please describe your project');
+        return;
+    }
+    
+    // Store the form data (we'll use this in the next step)
+    window.projectData = {
+        name: projectName,
+        description: projectDescription,
+        type: projectType
+    };
+    
+    // For now, just show a success message
+    showProjectSummary();
+}
+
+function showProjectSummary() {
+    const container = document.querySelector('.container');
+    container.innerHTML = `
+        <div class="custom-idea-step">
+            <div class="step-header">
+                <div class="step-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+                <h1>Perfect! Here's Your Project</h1>
+                <p>We've captured your project details. Let's review and move to the next step.</p>
+            </div>
+            
+            <div class="idea-form-card">
+                <h2>Project Summary</h2>
+                
+                <div class="project-summary">
+                    <div class="summary-item">
+                        <strong>Project Name:</strong> ${window.projectData.name}
+                    </div>
+                    <div class="summary-item">
+                        <strong>Type:</strong> ${window.projectData.type.charAt(0).toUpperCase() + window.projectData.type.slice(1)} Project
+                    </div>
+                    <div class="summary-item">
+                        <strong>Description:</strong> ${window.projectData.description}
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button onclick="goBack()" class="btn-secondary">
+                        ← Back
+                    </button>
+                    <button onclick="startBuilding()" class="btn-primary">
+                        Start Building →
+                    </button>
+                </div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%"></div>
+                </div>
+                <div class="progress-text">Step 2 of 4</div>
+            </div>
+        </div>
+    `;
+}
+
+function startBuilding() {
+    // This will be the next step - we'll implement this later
+    alert('Building functionality coming soon! This would take you to the next step in the workflow.');
 }
 
 // Add CSS for next step
