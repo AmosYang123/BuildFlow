@@ -53,91 +53,81 @@ function showNextStep(projectId) {
 function showCustomIdeaStep() {
     const container = document.querySelector('.container');
     container.innerHTML = `
-        <div class="custom-idea-step">
-            <div class="step-header">
-                <div class="step-icon">
+        <div class="ai-chat-interface">
+            <div class="chat-header">
+                <div class="ai-avatar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 12l2 2 4-4"/>
                         <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
                         <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
                     </svg>
                 </div>
-                <h1>Let's Bring Your Idea to Life!</h1>
-                <p>First, let's understand what you want to build. This will help us create the perfect workflow for your project.</p>
+                <div class="chat-title">
+                    <h1>BuildFlow AI Assistant</h1>
+                    <p>Tell me about your project idea and I'll help you build it</p>
+                </div>
             </div>
             
-            <div class="idea-form-card">
-                <h2>Step 1: Define Your Project</h2>
-                
-                <div class="form-group">
-                    <label for="project-name">What's your project called?</label>
-                    <input type="text" id="project-name" placeholder="e.g., My Portfolio, Recipe App, Travel Blog..." class="form-input">
-                </div>
-                
-                <div class="form-group">
-                    <label for="project-description">Describe what you want to build</label>
-                    <textarea id="project-description" placeholder="Tell us about your idea... What's the main purpose? Who is it for? What features do you envision?" class="form-textarea" rows="4"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>What type of project is this?</label>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="project-type" value="personal" checked>
-                            <span class="radio-custom"></span>
-                            <div class="radio-content">
-                                <div class="radio-icon">👤</div>
-                                <div>
-                                    <div class="radio-title">Personal Project</div>
-                                    <div class="radio-description">Portfolio, blog, hobby site, or personal experiment</div>
-                                </div>
-                            </div>
-                        </label>
-                        
-                        <label class="radio-option">
-                            <input type="radio" name="project-type" value="business">
-                            <span class="radio-custom"></span>
-                            <div class="radio-content">
-                                <div class="radio-icon">💼</div>
-                                <div>
-                                    <div class="radio-title">Business Project</div>
-                                    <div class="radio-description">Company website, startup, or commercial application</div>
-                                </div>
-                            </div>
-                        </label>
-                        
-                        <label class="radio-option">
-                            <input type="radio" name="project-type" value="community">
-                            <span class="radio-custom"></span>
-                            <div class="radio-content">
-                                <div class="radio-icon">🌍</div>
-                                <div>
-                                    <div class="radio-title">Community Project</div>
-                                    <div class="radio-description">Non-profit, educational, or community-focused site</div>
-                                </div>
-                            </div>
-                        </label>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4"/>
+                            <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                            <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
+                        </svg>
+                    </div>
+                    <div class="message-content">
+                        <p>Hi! I'm here to help you build your website. Tell me about your project idea - what do you want to create? You can describe it however you'd like!</p>
                     </div>
                 </div>
-                
-                <div class="form-actions">
-                    <button onclick="goBack()" class="btn-secondary">
-                        ← Back
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="chat-input" 
+                        placeholder="Describe your project idea... (e.g., 'I want to build a portfolio website for my photography business' or 'I need a blog for my cooking recipes')"
+                        class="chat-input"
+                        rows="1"
+                    ></textarea>
+                    <button id="send-button" class="send-button" onclick="sendMessage()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
                     </button>
-                    <button onclick="continueToNextStep()" class="btn-primary">
-                        Continue →
-                    </button>
+                </div>
+                <div class="input-hint">
+                    Press Enter to send • Shift+Enter for new line
                 </div>
             </div>
             
-            <div class="progress-bar-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 25%"></div>
-                </div>
-                <div class="progress-text">Step 1 of 4</div>
+            <div class="chat-actions">
+                <button onclick="goBack()" class="btn-secondary">
+                    ← Back to Project Selection
+                </button>
             </div>
         </div>
     `;
+    
+    // Focus on input and set up enter key handling
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    
+    chatInput.focus();
+    
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // Auto-resize textarea
+    chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
 }
 
 function getProjectTitle(projectId) {
@@ -149,30 +139,139 @@ function goBack() {
     location.reload();
 }
 
-function continueToNextStep() {
-    const projectName = document.getElementById('project-name').value;
-    const projectDescription = document.getElementById('project-description').value;
-    const projectType = document.querySelector('input[name="project-type"]:checked').value;
+function sendMessage() {
+    const chatInput = document.getElementById('chat-input');
+    const message = chatInput.value.trim();
     
-    if (!projectName.trim()) {
-        alert('Please enter a project name');
-        return;
+    if (!message) return;
+    
+    // Add user message to chat
+    addMessage(message, 'user');
+    
+    // Clear input
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    // Simulate AI processing (in real app, this would call an AI API)
+    setTimeout(() => {
+        hideTypingIndicator();
+        const aiResponse = analyzeProject(message);
+        addMessage(aiResponse, 'ai');
+    }, 1500);
+}
+
+function addMessage(content, sender) {
+    const chatMessages = document.getElementById('chat-messages');
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    if (sender === 'ai') {
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12l2 2 4-4"/>
+                    <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                    <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
+                </svg>
+            </div>
+            <div class="message-content">
+                <p>${content}</p>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <p>${content}</p>
+            </div>
+        `;
     }
     
-    if (!projectDescription.trim()) {
-        alert('Please describe your project');
-        return;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chat-messages');
+    
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message ai-message typing-indicator';
+    typingDiv.id = 'typing-indicator';
+    
+    typingDiv.innerHTML = `
+        <div class="message-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
+            </svg>
+        </div>
+        <div class="message-content">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTypingIndicator() {
+    const typingIndicator = document.getElementById('typing-indicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
+
+function analyzeProject(userMessage) {
+    const message = userMessage.toLowerCase();
+    
+    // Simple keyword-based analysis (in real app, this would use AI)
+    if (message.includes('portfolio') || message.includes('personal') || message.includes('resume')) {
+        return `I understand! You want to build a <strong>Personal Portfolio</strong> website. This is perfect for showcasing your work, skills, and experience. 
+
+Let me help you create a professional portfolio. What kind of work do you want to showcase? (e.g., design, development, photography, writing, etc.)`;
     }
     
-    // Store the form data (we'll use this in the next step)
-    window.projectData = {
-        name: projectName,
-        description: projectDescription,
-        type: projectType
-    };
+    if (message.includes('blog') || message.includes('blog') || message.includes('article')) {
+        return `Great! You're looking to build a <strong>Blog</strong> website. This is excellent for sharing your thoughts, expertise, or stories.
+
+What will your blog be about? (e.g., cooking, travel, technology, lifestyle, etc.)`;
+    }
     
-    // For now, just show a success message
-    showProjectSummary();
+    if (message.includes('business') || message.includes('company') || message.includes('startup') || message.includes('ecommerce') || message.includes('shop')) {
+        return `Perfect! You want to build a <strong>Business Website</strong>. This could be a company site, startup landing page, or e-commerce store.
+
+What type of business is this? (e.g., service-based, product sales, SaaS, etc.)`;
+    }
+    
+    if (message.includes('restaurant') || message.includes('cafe') || message.includes('food') || message.includes('menu')) {
+        return `Excellent! You're building a <strong>Restaurant or Food Business</strong> website. This is great for showcasing your menu, location, and services.
+
+Do you want to include online ordering, reservations, or just information about your restaurant?`;
+    }
+    
+    if (message.includes('nonprofit') || message.includes('charity') || message.includes('community') || message.includes('education')) {
+        return `Wonderful! You're creating a <strong>Community or Nonprofit</strong> website. This is perfect for making a positive impact.
+
+What's the main purpose of your organization? (e.g., education, charity, community service, etc.)`;
+    }
+    
+    // Default response for unrecognized projects
+    return `Interesting project idea! I can help you build this. 
+
+To better understand your needs, could you tell me:
+• What's the main purpose of your website?
+• Who is your target audience?
+• What features do you envision?
+
+This will help me create the perfect workflow for your project!`;
 }
 
 function showProjectSummary() {
