@@ -1,22 +1,29 @@
-// Groq AI API integration for BuildFlow
-// This would be deployed as a serverless function (Vercel, Netlify, etc.)
+// Netlify function for Groq AI integration
+// This file should be placed in: netlify/functions/analyze-project.js
 
-export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+exports.handler = async function(event, context) {
+    // Only allow POST requests
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
 
     try {
-        const { message, conversationHistory } = req.body;
+        const { message, conversationHistory } = JSON.parse(event.body);
 
         // Groq API configuration
         const GROQ_API_KEY = process.env.GROQ_API_KEY;
         
         if (!GROQ_API_KEY) {
-            return res.status(500).json({ 
-                error: 'Groq API key not configured',
-                response: 'I understand you want to build something! To help you better, could you tell me more about what you want to create?'
-            });
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ 
+                    error: 'Groq API key not configured',
+                    response: 'I understand you want to build something! To help you better, could you tell me more about what you want to create?'
+                })
+            };
         }
 
         // Prepare conversation for Groq
@@ -74,13 +81,29 @@ Be conversational, ask follow-up questions, and help users clarify their project
         const data = await response.json();
         const aiResponse = data.choices[0].message.content;
 
-        return res.status(200).json({ response: aiResponse });
+        return {
+            statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+            body: JSON.stringify({ response: aiResponse })
+        };
 
     } catch (error) {
         console.error('API Error:', error);
-        return res.status(500).json({ 
-            error: 'Internal server error',
-            response: 'I understand you want to build something! To help you better, could you tell me more about what you want to create?'
-        });
+        return {
+            statusCode: 500,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+            body: JSON.stringify({ 
+                error: 'Internal server error',
+                response: 'I understand you want to build something! To help you better, could you tell me more about what you want to create?'
+            })
+        };
     }
-} 
+}; 

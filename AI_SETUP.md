@@ -1,15 +1,22 @@
-# AI Integration Setup Guide
+# Groq AI Integration Setup Guide
 
 ## Current Status
-The BuildFlow project now has the infrastructure for real AI integration, but needs to be deployed with a backend service to work with OpenAI.
+The BuildFlow project now has the infrastructure for real AI integration using Groq, but needs to be deployed with a backend service to work.
 
 ## What's Implemented
 
 ✅ **Frontend AI Chat Interface** - Bolt.new-style chat UI  
-✅ **API Integration Code** - Ready to call OpenAI API  
+✅ **Groq API Integration** - Ready to call Groq's fast AI API  
 ✅ **Conversation History** - Maintains context across messages  
 ✅ **Smart Fallback** - Works even if AI is unavailable  
 ✅ **Loading States** - Shows spinner during AI processing  
+
+## Why Groq?
+
+🚀 **Ultra-Fast** - Responses in milliseconds  
+💰 **Cost-Effective** - Much cheaper than OpenAI  
+🔒 **Privacy-Focused** - Better data handling  
+⚡ **High Performance** - Optimized for speed  
 
 ## To Enable Real AI
 
@@ -21,10 +28,10 @@ The BuildFlow project now has the infrastructure for real AI integration, but ne
    - Import your forked repository
    - Vercel will automatically detect it as a static site
 
-3. **Add OpenAI API Key**:
+3. **Add Groq API Key**:
    - In Vercel dashboard, go to your project settings
-   - Add environment variable: `OPENAI_API_KEY`
-   - Set value to your OpenAI API key
+   - Add environment variable: `GROQ_API_KEY`
+   - Set value to your Groq API key
 
 4. **Create API Route**:
    - Create `api/analyze-project.js` in your repository
@@ -39,32 +46,23 @@ The BuildFlow project now has the infrastructure for real AI integration, but ne
    - Set build command: `echo "Static site"`
    - Set publish directory: `.`
 
-3. **Add OpenAI API Key**:
+3. **Add Groq API Key**:
    - In Netlify dashboard, go to Site settings → Environment variables
-   - Add: `OPENAI_API_KEY` with your API key
+   - Add: `GROQ_API_KEY` with your API key
 
 4. **Create Netlify Function**:
    - Create `netlify/functions/analyze-project.js`
    - Use the same code as the API file
 
-### Option 3: Use a Different AI Service
-
-You can easily swap OpenAI for other AI services:
-
-- **Anthropic Claude** - Replace OpenAI API calls
-- **Google Gemini** - Use Google's AI API
-- **Local AI** - Run AI models locally
-- **Custom AI** - Your own trained model
-
 ## API Key Setup
 
-1. **Get OpenAI API Key**:
-   - Go to [platform.openai.com](https://platform.openai.com)
+1. **Get Groq API Key**:
+   - Go to [console.groq.com](https://console.groq.com)
    - Sign up/login and go to API Keys
    - Create a new API key
 
 2. **Add to Environment**:
-   - Set as environment variable: `OPENAI_API_KEY`
+   - Set as environment variable: `GROQ_API_KEY`
    - Never commit API keys to code
 
 ## Testing
@@ -85,14 +83,21 @@ If AI is not available, the system uses:
 
 ## Cost Considerations
 
-- **OpenAI GPT-3.5-turbo**: ~$0.002 per 1K tokens
+- **Groq Llama3-8b**: ~$0.0001 per 1K tokens (much cheaper!)
 - **Typical conversation**: 50-200 tokens per message
-- **Estimated cost**: $0.01-0.05 per user session
+- **Estimated cost**: $0.001-0.005 per user session (10x cheaper than OpenAI)
+
+## Groq Models Available
+
+- **llama3-8b-8192** - Fast and cost-effective (current)
+- **llama3-70b-8192** - More powerful, slightly slower
+- **mixtral-8x7b-32768** - Good balance of speed and quality
+- **gemma2-9b-it** - Google's model, very fast
 
 ## Next Steps
 
 1. **Deploy with backend** (Vercel/Netlify)
-2. **Add your OpenAI API key**
+2. **Add your Groq API key**
 3. **Test the AI responses**
 4. **Customize the AI prompts** for better responses
 5. **Add more project types** and workflows
