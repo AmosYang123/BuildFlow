@@ -128,6 +128,24 @@ function showCustomIdeaStep() {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
+    
+    // Test if Netlify functions are working
+    testNetlifyFunction();
+}
+
+async function testNetlifyFunction() {
+    try {
+        const response = await fetch('/.netlify/functions/test');
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Netlify functions are working:', data);
+        } else {
+            console.log('❌ Netlify function test failed:', response.status);
+        }
+    } catch (error) {
+        console.log('❌ Netlify function test error:', error);
+    }
+}
 }
 
 function getProjectTitle(projectId) {
@@ -240,6 +258,9 @@ async function analyzeProject(userMessage) {
         sendButton.innerHTML = '<div class="loading-spinner"></div>';
         sendButton.disabled = true;
         
+        // Test if Netlify function exists first
+        console.log('Attempting to call Netlify function...');
+        
         // Call Groq API via Netlify function
         const response = await fetch('/.netlify/functions/analyze-project', {
             method: 'POST',
@@ -251,6 +272,9 @@ async function analyzeProject(userMessage) {
                 conversationHistory: getConversationHistory()
             })
         });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
         
         if (!response.ok) {
             const errorText = await response.text();
