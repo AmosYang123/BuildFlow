@@ -1,6 +1,7 @@
 let selectedProject = null;
 
 function selectProject(projectId) {
+    console.log('Card clicked! Project ID:', projectId);
     // Go directly to next step without delay or feedback
     showNextStep(projectId);
 }
